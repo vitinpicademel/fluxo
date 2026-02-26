@@ -1,62 +1,54 @@
-require { Request, Response, NextFunction } from 'express'
-require jwt from 'jsonwebtoken'
-require { PrismaClient } from '@prisma/client'
-require { AuthRequest } from '../types'
+const jwt = require('jsonwebtoken');
+const { PrismaClient } = require('@prisma/client');
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
-export const authenticateToken = async (
-  req: AuthRequest,
-  res: Response,
-  next: NextFunction
-) => {
-  const authHeader = req.headers['authorization']
-  const token = authHeader && authHeader.split(' ')[1]
+const authenticateToken = async (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
 
   if (!token) {
-    return res.status(401).json({ error: 'Token de acesso necessário' })
+    return res.status(401).json({ error: 'Token de acesso necessário' });
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await prisma.user.findUnique({
       where: { id: decoded.userId },
       select: { id: true, email: true, name: true, role: true }
-    })
+    });
 
     if (!user) {
-      return res.status(401).json({ error: 'Usuário não encontrado' })
+      return res.status(401).json({ error: 'Usuário não encontrado' });
     }
 
-    req.user = user
-    next()
+    req.user = user;
+    next();
   } catch (error) {
-    return res.status(403).json({ error: 'Token inválido' })
+    return res.status(403).json({ error: 'Token inválido' });
   }
-}
+};
 
-export const requireAdmin = (
-  req: AuthRequest,
-  res: Response,
-  next: NextFunction
-) => {
+const requireAdmin = (req, res, next) => {
   if (!req.user || req.user.role !== 'ADMIN') {
     return res.status(403).json({ 
       error: 'Acesso negado. Permissão de administrador necessária.' 
-    })
+    });
   }
-  next()
-}
+  next();
+};
 
-export const requireUser = (
-  req: AuthRequest,
-  res: Response,
-  next: NextFunction
-) => {
+const requireUser = (req, res, next) => {
   if (!req.user) {
     return res.status(403).json({ 
       error: 'Acesso negado. Usuário não autenticado.' 
-    })
+    });
   }
-  next()
-}
+  next();
+};
+
+module.exports = {
+  authenticateToken,
+  requireAdmin,
+  requireUser
+};

@@ -1,10 +1,8 @@
-require { Response } from 'express'
-require { PrismaClient } from '@prisma/client'
-require { AuthRequest, ProjectDTO, SalesDataDTO } from '../types'
-require { FinancialService } from '../services/financialService'
-require { z } from 'zod'
+const { PrismaClient } = require('@prisma/client');
+const { FinancialService } = require('../services/financialService');
+const { z } = require('zod');
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
 const projectSchema = z.object({
   companyName: z.string().min(2, 'Nome da empresa é obrigatório'),
@@ -20,7 +18,7 @@ const projectSchema = z.object({
   averageUnitValue: z.number().min(0, 'Valor médio por unidade deve ser maior que 0'),
   salesStartDate: z.string().min(1, 'Data de início é obrigatória'),
   salesDurationMonths: z.number().min(1, 'Duração deve ser maior que 0'),
-})
+});
 
 const salesDataSchema = z.object({
   salesData: z.array(z.object({
@@ -28,15 +26,15 @@ const salesDataSchema = z.object({
     year: z.number().min(2020).max(2030),
     unitsSold: z.number().min(0)
   }))
-})
+});
 
-export const createProject = async (req: AuthRequest, res: Response) => {
+const createProject = async (req, res) => {
   try {
-    const validatedData = projectSchema.parse(req.body) as ProjectDTO
+    const validatedData = projectSchema.parse(req.body);
     
     const project = await prisma.project.create({
       data: {
-        userId: req.user!.id,
+        userId: req.user.id,
         companyName: validatedData.companyName,
         cnpj: validatedData.cnpj,
         responsibleName: validatedData.responsibleName,
@@ -51,7 +49,7 @@ export const createProject = async (req: AuthRequest, res: Response) => {
         salesStartDate: new Date(validatedData.salesStartDate),
         salesDurationMonths: validatedData.salesDurationMonths,
       }
-    })
+    });
 
     res.status(201).json({
       message: 'Projeto criado com sucesso',
@@ -61,44 +59,41 @@ export const createProject = async (req: AuthRequest, res: Response) => {
         status: project.status,
         createdAt: project.createdAt
       }
-    })
+    });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return res.status(400).json({ 
         error: 'Dados inválidos', 
         details: error.errors 
-      })
+      });
     }
-    res.status(500).json({ error: 'Erro ao criar projeto' })
+    res.status(500).json({ error: 'Erro ao criar projeto' });
   }
-}
+};
 
-export const submitSalesData = async (req: AuthRequest, res: Response) => {
+const submitSalesData = async (req, res) => {
   try {
-    const { projectId } = req.params
-    const validatedData = salesDataSchema.parse(req.body)
+    const { projectId } = req.params;
+    const validatedData = salesDataSchema.parse(req.body);
     
-    // Verificar se o projeto pertence ao usuário
     const project = await prisma.project.findFirst({
       where: {
         id: projectId,
-        userId: req.user!.id
+        userId: req.user.id
       }
-    })
+    });
 
     if (!project) {
-      return res.status(404).json({ error: 'Projeto não encontrado' })
+      return res.status(404).json({ error: 'Projeto não encontrado' });
     }
 
-    // Validar se a soma das unidades vendidas bate com o total
-    const totalUnitsSold = validatedData.salesData.reduce((sum, data) => sum + data.unitsSold, 0)
+    const totalUnitsSold = validatedData.salesData.reduce((sum, data) => sum + data.unitsSold, 0);
     if (totalUnitsSold !== project.totalUnits) {
       return res.status(400).json({ 
         error: `Total de unidades vendidas (${totalUnitsSold}) não bate com o total do projeto (${project.totalUnits})` 
-      })
+      });
     }
 
-    // Salvar dados de vendas
     for (const salesData of validatedData.salesData) {
       await prisma.salesData.upsert({
         where: {
@@ -117,48 +112,44 @@ export const submitSalesData = async (req: AuthRequest, res: Response) => {
           year: salesData.year,
           unitsSold: salesData.unitsSold
         }
-      })
+      });
     }
 
-    // Gerar cálculos financeiros (apenas no backend)
     const calculations = await FinancialService.generateFinancialProjections(
       projectId,
       project.totalUnits,
       project.averageUnitValue,
       validatedData.salesData
-    )
+    );
 
-    // Salvar dados financeiros
-    await FinancialService.saveFinancialData(projectId, calculations)
+    await FinancialService.saveFinancialData(projectId, calculations);
 
-    // Atualizar status do projeto
     await prisma.project.update({
       where: { id: projectId },
       data: { status: 'APPROVED' }
-    })
+    });
 
-    // Retornar apenas feedback qualitativo para o usuário
     res.json({
       message: 'Projeto recebido para análise',
       status: 'Premissas validadas',
       details: 'Projeto elegível para análise financeira'
-    })
+    });
 
   } catch (error) {
     if (error instanceof z.ZodError) {
       return res.status(400).json({ 
         error: 'Dados inválidos', 
         details: error.errors 
-      })
+      });
     }
-    res.status(500).json({ error: 'Erro ao submeter dados de vendas' })
+    res.status(500).json({ error: 'Erro ao submeter dados de vendas' });
   }
-}
+};
 
-export const getMyProjects = async (req: AuthRequest, res: Response) => {
+const getMyProjects = async (req, res) => {
   try {
     const projects = await prisma.project.findMany({
-      where: { userId: req.user!.id },
+      where: { userId: req.user.id },
       select: {
         id: true,
         companyName: true,
@@ -186,22 +177,22 @@ export const getMyProjects = async (req: AuthRequest, res: Response) => {
       orderBy: {
         createdAt: 'desc'
       }
-    })
+    });
 
-    res.json(projects)
+    res.json(projects);
   } catch (error) {
-    res.status(500).json({ error: 'Erro ao buscar projetos' })
+    res.status(500).json({ error: 'Erro ao buscar projetos' });
   }
-}
+};
 
-export const getProjectDetails = async (req: AuthRequest, res: Response) => {
+const getProjectDetails = async (req, res) => {
   try {
-    const { projectId } = req.params
+    const { projectId } = req.params;
     
     const project = await prisma.project.findFirst({
       where: {
         id: projectId,
-        userId: req.user!.id
+        userId: req.user.id
       },
       select: {
         id: true,
@@ -232,20 +223,19 @@ export const getProjectDetails = async (req: AuthRequest, res: Response) => {
           ]
         }
       }
-    })
+    });
 
     if (!project) {
-      return res.status(404).json({ error: 'Projeto não encontrado' })
+      return res.status(404).json({ error: 'Projeto não encontrado' });
     }
 
-    res.json(project)
+    res.json(project);
   } catch (error) {
-    res.status(500).json({ error: 'Erro ao buscar detalhes do projeto' })
+    res.status(500).json({ error: 'Erro ao buscar detalhes do projeto' });
   }
-}
+};
 
-// Endpoints exclusivos para ADMIN
-export const getAllProjects = async (req: AuthRequest, res: Response) => {
+const getAllProjects = async (req, res) => {
   try {
     const projects = await prisma.project.findMany({
       include: {
@@ -267,35 +257,35 @@ export const getAllProjects = async (req: AuthRequest, res: Response) => {
       orderBy: {
         createdAt: 'desc'
       }
-    })
+    });
 
-    res.json(projects)
+    res.json(projects);
   } catch (error) {
-    res.status(500).json({ error: 'Erro ao buscar todos os projetos' })
+    res.status(500).json({ error: 'Erro ao buscar todos os projetos' });
   }
-}
+};
 
-export const getProjectFinancials = async (req: AuthRequest, res: Response) => {
+const getProjectFinancials = async (req, res) => {
   try {
-    const { projectId } = req.params
+    const { projectId } = req.params;
     
-    const financials = await FinancialService.getProjectFinancials(projectId)
-    const cashFlow = await FinancialService.getMonthlyCashFlow(projectId)
+    const financials = await FinancialService.getProjectFinancials(projectId);
+    const cashFlow = await FinancialService.getMonthlyCashFlow(projectId);
 
     if (!financials) {
-      return res.status(404).json({ error: 'Dados financeiros não encontrados' })
+      return res.status(404).json({ error: 'Dados financeiros não encontrados' });
     }
 
     res.json({
       financials,
       cashFlow
-    })
+    });
   } catch (error) {
-    res.status(500).json({ error: 'Erro ao buscar dados financeiros' })
+    res.status(500).json({ error: 'Erro ao buscar dados financeiros' });
   }
-}
+};
 
-export const getAllUsers = async (req: AuthRequest, res: Response) => {
+const getAllUsers = async (req, res) => {
   try {
     const users = await prisma.user.findMany({
       where: { role: 'USER' },
@@ -316,10 +306,20 @@ export const getAllUsers = async (req: AuthRequest, res: Response) => {
       orderBy: {
         createdAt: 'desc'
       }
-    })
+    });
 
-    res.json(users)
+    res.json(users);
   } catch (error) {
-    res.status(500).json({ error: 'Erro ao buscar usuários' })
+    res.status(500).json({ error: 'Erro ao buscar usuários' });
   }
-}
+};
+
+module.exports = {
+  createProject,
+  submitSalesData,
+  getMyProjects,
+  getProjectDetails,
+  getAllProjects,
+  getProjectFinancials,
+  getAllUsers
+};
