@@ -2,7 +2,7 @@
   "name": "sistema-imobiliario-frontend",
   "version": "1.0.0",
   "description": "Frontend React para sistema imobiliário",
-  "homepage": "https://vitinpicademel.github.io/fluxo",
+  "homepage": ".",
   "private": true,
   "dependencies": {
     "react": "^18.2.0",
