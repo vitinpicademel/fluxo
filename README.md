@@ -1,157 +1,178 @@
-# Sistema Imobiliário - Fluxo Nominal de Vendas
+# Sistema Imobiliário - Fluxo de Caixa Automatizado
 
-Sistema completo para gestão de projetos imobiliários com separação estrita entre visão do usuário (incorporadora) e cálculos financeiros internos (admin).
+Sistema completo para gestão de projetos imobiliários com fluxo de caixa automatizado que substitui planilhas Excel por uma interface moderna e profissional.
 
-## 🏗️ Estrutura do Projeto
+## 🎯 Funcionalidades Principais
 
-```
-planilh/
-├── backend/                 # API Node.js + TypeScript + Prisma
-│   ├── src/
-│   │   ├── controllers/     # Controladores da API
-│   │   ├── middleware/      # Middlewares de autenticação
-│   │   ├── routes/          # Rotas da API
-│   │   ├── services/        # Serviços de negócio
-│   │   └── types/           # Tipos TypeScript
-│   ├── prisma/
-│   │   └── schema.prisma    # Schema do banco de dados
-│   └── package.json
-├── frontend/                # React + TypeScript + Tailwind
-│   ├── src/
-│   │   ├── components/      # Componentes React
-│   │   ├── pages/           # Páginas da aplicação
-│   │   ├── services/        # Serviços de API
-│   │   └── types/           # Tipos TypeScript
-│   └── package.json
-├── database.sql             # Schema SQL completo
-└── README.md
-```
+### 🏢 Para Incorporadoras (USER)
+- **Cadastro de projetos** completo com dados da empresa
+- **Fluxo de caixa automatizado** que substitui planilhas
+- **Cálculos automáticos** de VGV, margem e despesas
+- **Interface visual profissional** com cards e tabelas
+- **Dashboard personalizado** com estatísticas
 
-## 🚀 Funcionalidades Principais
+### 🛡️ Para Administradores (ADMIN)
+- **Visão geral** de todos os projetos e usuários
+- **Acesso completo** aos dados financeiros
+- **Gestão de incorporadoras** e projetos
+- **Relatórios detalhados** do sistema
 
-### 🔐 Sistema de Autenticação e RBAC
-- **USER (Incorporadora)**: Acesso limitado ao próprio painel
-- **ADMIN (Consultoria)**: Acesso completo a todos os dados financeiros
-
-### 📊 Fluxo de Trabalho do Usuário (Incorporadora)
-
-#### Etapa 1: Cadastro do Projeto
-- Nome da empresa, CNPJ, responsável
-- Localização e tipo do projeto
-- Premissas gerais de vendas
-
-#### Etapa 2: Premissas de Vendas
-- Total de unidades e valor médio
-- Duração da curva de vendas
-- Distribuição mensal de unidades
-
-### 💰 Cálculos Financeiros (Backend - Oculto)
-- VGV Total = Valor Médio × Total Unidades
-- Valor de Vendas Mensal
-- Entradas (10%) e Parcelas (90%/36 meses)
-- Projeção de Recebíveis
-- Receita Total de Vendas
+### 🚀 Sistema de Fluxo de Caixa
+- **3 etapas intuitivas**: Dados básicos → Parâmetros → Resultados
+- **Cálculos automáticos**: Curva de vendas, receitas, despesas
+- **Visualização profissional**: Cards, tabelas, indicadores
+- **Substituição completa** de planilhas Excel
 
 ## 🛠️ Tecnologias
 
 ### Backend
-- **Node.js** + **TypeScript**
-- **Express.js** - Framework web
-- **Prisma** - ORM e schema do banco
-- **PostgreSQL** - Banco de dados
-- **JWT** - Autenticação
-- **bcryptjs** - Hash de senhas
-- **Zod** - Validação de dados
+- **Node.js** + **TypeScript** + **Express**
+- **Prisma ORM** + **SQLite** (banco de dados)
+- **JWT** para autenticação
+- **bcryptjs** para senhas
+- **Zod** para validação
 
 ### Frontend
-- **React** + **TypeScript**
-- **React Router** - Navegação
-- **Tailwind CSS** - Estilização
-- **React Hook Form** - Formulários
-- **Axios** - Cliente HTTP
-- **Lucide React** - Ícones
+- **React** + **JavaScript**
+- **React Router** para navegação
+- **Tailwind CSS** para estilização
+- **Lucide React** para ícones
+- **Design moderno e responsivo**
 
-## 📋 Endpoints da API
+## 📊 Estrutura do Projeto
 
-### Autenticação
-- `POST /api/auth/register` - Criar usuário
-- `POST /api/auth/login` - Login
-- `GET /api/auth/profile` - Perfil do usuário
-
-### Projetos (USER)
-- `POST /api/projects` - Criar projeto
-- `GET /api/projects/my-projects` - Meus projetos
-- `POST /api/projects/:id/sales-data` - Submeter dados de vendas
-
-### Admin (ADMIN)
-- `GET /api/projects/admin/all` - Todos os projetos
-- `GET /api/projects/admin/users` - Todos os usuários
-- `GET /api/projects/admin/:id/financials` - Dados financeiros
-
-## 🗄️ Estrutura do Banco de Dados
-
-### Tabelas Principais
-- **users**: Usuários e papéis (USER/ADMIN)
-- **projects**: Dados dos projetos imobiliários
-- **sales_data**: Curva de vendas mensal
-- **financial_data**: Cálculos financeiros (apenas admin)
-- **monthly_cash_flow**: Fluxo de caixa mensal
-
-## 🔒 Segurança e Restrições
-
-### Para Usuários (USER)
-- ✅ Acesso apenas aos próprios projetos
-- ❌ Nunca visualiza dados financeiros (receitas, despesas, margem)
-- ✅ Feedback qualitativo apenas ("Projeto recebido para análise")
-
-### Para Administradores (ADMIN)
-- ✅ Acesso completo a todos os projetos
-- ✅ Visualização de todos os cálculos financeiros
-- ✅ Gestão de usuários e projetos
+```
+planilh/
+├── src/                     # Backend Node.js
+│   ├── controllers/         # Lógica da API
+│   ├── middleware/          # Autenticação e RBAC
+│   ├── routes/              # Rotas da API
+│   ├── services/            # Serviços financeiros
+│   └── types/               # Tipos TypeScript
+├── frontend/                # React Frontend
+│   ├── src/
+│   │   ├── components/      # Componentes reutilizáveis
+│   │   ├── AdminDashboard.js # Painel admin
+│   │   ├── Dashboard.js     # Dashboard usuário
+│   │   ├── FluxoForm.js     # Formulário fluxo caixa
+│   │   ├── ProjectForm.js   # Cadastro projetos
+│   │   └── Login.js         # Autenticação
+├── prisma/                  # Schema e migrations
+└── README.md
+```
 
 ## 🚀 Instalação e Execução
 
+### Pré-requisitos
+- Node.js 18+
+- npm ou yarn
+
 ### Backend
 ```bash
-cd backend
+# Instalar dependências
 npm install
+
+# Configurar ambiente
 cp .env.example .env
-# Configurar DATABASE_URL no .env
-npm run prisma:migrate
-npm run prisma:generate
+# Editar .env com suas configurações
+
+# Rodar migrations do banco
+npx prisma migrate dev
+
+# Iniciar servidor backend
 npm run dev
+# Servidor rodará em http://localhost:3001
 ```
 
 ### Frontend
 ```bash
+# Entrar na pasta frontend
 cd frontend
+
+# Instalar dependências
 npm install
+
+# Iniciar servidor frontend
 npm start
+# Frontend rodará em http://localhost:3003
 ```
 
-## 📝 Regras de Negócio
+## � Acesso ao Sistema
 
-### Validações Importantes
-- Total de unidades na curva deve bater com total do projeto
-- CNPJ e email devem ser únicos
-- Apenas ADMIN pode acessar dados financeiros
-- Usuário só pode acessar próprios projetos
+### Usuário de Teste (Incorporadora)
+- **Email**: `test@email.com`
+- **Senha**: `123456`
 
-### Cálculos Automáticos
-- VGV, receitas e fluxo de caixa calculados no backend
-- Separação estrita entre frontend e backend
-- Dados financeiros nunca expostos ao usuário final
+### Administrador Master
+- **Email**: `admin@imobiliario.com`
+- **Senha**: `admin123`
 
-## 🎯 Fluxo Completo
+## 📋 Funcionalidades Detalhadas
 
-1. **Incorporadora** cria conta e faz login
-2. **Cadastro do projeto** com dados da empresa
-3. **Preenchimento das premissas** de vendas
-4. **Submissão da curva** de vendas mensal
-5. **Backend processa** cálculos financeiros
-6. **Feedback qualitativo** para o usuário
-7. **Admin acessa** dados completos no dashboard
+### 🏠 Fluxo de Caixa Automatizado
+1. **Etapa 1 - Dados Básicos**:
+   - Data de início das vendas
+   - Quantidade total de unidades
+   - Valor médio por unidade
+   - Período de vendas (meses)
+
+2. **Etapa 2 - Parâmetros Financeiros**:
+   - Percentuais de entrada e parcelado
+   - Configurações de despesas (ITBI, terreno, obra)
+   - Taxas administrativas e comissões
+
+3. **Etapa 3 - Resultados**:
+   - VGV (Valor Geral de Vendas)
+   - Despesas detalhadas
+   - Margem bruta
+   - Fluxo mensal completo
+
+### 📊 Dashboard Incorporadora
+- Cards com estatísticas (projetos, unidades, status)
+- Lista de projetos com status
+- Navegação intuitiva
+- Design profissional
+
+### 🛡️ Painel Administrativo
+- Visão geral de todos os projetos
+- Lista de incorporadoras cadastradas
+- Estatísticas globais do sistema
+- Acesso a dados financeiros completos
+
+## 🔒 Segurança e Permissões
+
+### USER (Incorporadora)
+- ✅ Criar e gerenciar próprios projetos
+- ✅ Acessar fluxo de caixa dos seus projetos
+- ✅ Visualizar resultados dos cálculos
+- ❌ Acessar dados de outros usuários
+
+### ADMIN (Administrador)
+- ✅ Acesso completo a todos os projetos
+- ✅ Visualizar dados de todas as incorporadoras
+- ✅ Gerenciar usuários do sistema
+- ✅ Acesso a relatórios globais
+
+## 🎯 Como Usar
+
+1. **Criar conta** como incorporadora ou usar login de teste
+2. **Cadastrar projeto** com dados da empresa
+3. **Acessar Fluxo de Caixa** no menu lateral
+4. **Preencher dados** básicos do projeto
+5. **Ajustar parâmetros** financeiros se necessário
+6. **Visualizar resultados** automáticos e profissionais
+
+## 🔄 Substituição de Planilhas
+
+O sistema substitui completamente planilhas Excel oferecendo:
+- **Cálculos automáticos** e precisos
+- **Interface visual** moderna e intuitiva
+- **Validação de dados** em tempo real
+- **Histórico** de projetos e simulações
+- **Acesso colaborativo** para equipes
 
 ---
 
-**Nota**: Este sistema foi projetado com separação estrita entre visão do usuário e cálculos financeiros, garantindo confidencialidade dos dados comerciais enquanto proporciona uma experiência completa para as incorporadoras.
+**GitHub**: https://github.com/vitinpicademel/fluxo  
+**Status**: ✅ Produção Ready  
+**Versão**: 1.0.0
