@@ -13,7 +13,8 @@ app.enable('trust proxy');
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
-  message: 'Muitas requisições deste IP, tente novamente mais tarde.'
+  message: 'Muitas requisições deste IP, tente novamente mais tarde.',
+  trustProxy: false
 });
 
 app.use(helmet());
