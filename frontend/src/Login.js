@@ -15,6 +15,22 @@ const Login = () => {
     setLoading(true);
     setError('');
     
+    // TODO: REMOVER BYPASS DE LOGIN - Bypass temporário para testar frontend
+    const testUser = {
+      id: 'test-user-id',
+      email: email || 'test@email.com',
+      name: 'Usuário Teste',
+      role: 'USER'
+    };
+    
+    localStorage.setItem('token', 'test-token');
+    localStorage.setItem('user', JSON.stringify(testUser));
+    navigate('/dashboard');
+    setLoading(false);
+    return;
+    
+    // Código original (comentado temporariamente)
+    /*
     try {
       const response = await fetch('/api/auth/login', {
         method: 'POST',
@@ -35,6 +51,7 @@ const Login = () => {
     } finally {
       setLoading(false);
     }
+    */
   };
 
   return (
