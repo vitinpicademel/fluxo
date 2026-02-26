@@ -1,1 +1,1 @@
-{"version": 2, "builds": [{"src": "src/index.ts", "use": "@vercel/node"}], "routes": [{"src": "/(.*)", "dest": "src/index.ts"}], "env": {"PRISMA_GENERATE_DATAPROXY": "true"}}
+{"version": 2, "builds": [{"src": "api/index.js", "use": "@vercel/node"}], "routes": [{"src": "/(.*)", "dest": "api/index.js"}]}
