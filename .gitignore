@@ -2,9 +2,9 @@
 node_modules/
 */node_modules/
 
-# Production builds
-/frontend/build/
+# Production builds (keep frontend/build for GitHub Pages)
 /backend/dist/
+/frontend/build/
 
 # Environment variables
 .env
