@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/fluxo/static/css/main.7a5a6401.css",
+    "main.js": "/fluxo/static/js/main.2490006e.js",
+    "index.html": "/fluxo/index.html",
+    "main.7a5a6401.css.map": "/fluxo/static/css/main.7a5a6401.css.map",
+    "main.2490006e.js.map": "/fluxo/static/js/main.2490006e.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.7a5a6401.css",
+    "static/js/main.2490006e.js"
+  ]
+}
