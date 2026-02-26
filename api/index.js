@@ -2,12 +2,10 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
-const { PrismaClient } = require('@prisma/client');
-
-const authRoutes = require('./routes/auth');
-const projectRoutes = require('./routes/projects');
 
 const app = express();
+
+app.enable('trust proxy');
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -26,11 +24,7 @@ app.get('/', (req, res) => {
     status: 'API online e funcionando perfeitamente!',
     message: 'Sistema Imobiliário Backend',
     version: '1.0.0',
-    endpoints: {
-      auth: '/api/auth',
-      projects: '/api/projects',
-      health: '/health'
-    }
+    timestamp: new Date().toISOString()
   });
 });
 
@@ -41,9 +35,6 @@ app.get('/health', (req, res) => {
     uptime: process.uptime()
   });
 });
-
-app.use('/api/auth', authRoutes);
-app.use('/api/projects', projectRoutes);
 
 app.use((err, req, res, next) => {
   console.error('Erro:', err);
