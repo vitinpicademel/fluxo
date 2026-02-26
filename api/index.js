@@ -21,6 +21,19 @@ app.use(limiter);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
+app.get('/', (req, res) => {
+  res.json({ 
+    status: 'API online e funcionando perfeitamente!',
+    message: 'Sistema Imobiliário Backend',
+    version: '1.0.0',
+    endpoints: {
+      auth: '/api/auth',
+      projects: '/api/projects',
+      health: '/health'
+    }
+  });
+});
+
 app.get('/health', (req, res) => {
   res.json({ 
     status: 'OK', 
