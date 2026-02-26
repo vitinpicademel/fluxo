@@ -1,11 +1,11 @@
-import { PrismaClient } from '@prisma/client';
-import { FinancialCalculations, SalesDataDTO } from '../types';
+require { PrismaClient } from '@prisma/client'
+require { FinancialCalculations, SalesDataDTO } from '../types'
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient()
 
 export class FinancialService {
   static calculateVGV(totalUnits: number, averageUnitValue: number): number {
-    return totalUnits * averageUnitValue;
+    return totalUnits * averageUnitValue
   }
 
   static calculateMonthlySalesValue(
@@ -13,19 +13,19 @@ export class FinancialService {
     totalUnits: number, 
     unitsSold: number
   ): number {
-    return (totalVGV / totalUnits) * unitsSold;
+    return (totalVGV / totalUnits) * unitsSold
   }
 
   static calculatePaymentTerms(salesValue: number) {
-    const entryValue = salesValue * 0.10; // 10% de entrada
-    const parcelValue = salesValue * 0.90; // 90% parcelado
-    const monthlyParcel = parcelValue / 36; // Parcela mensal em 36 meses
+    const entryValue = salesValue * 0.10 // 10% de entrada
+    const parcelValue = salesValue * 0.90 // 90% parcelado
+    const monthlyParcel = parcelValue / 36 // Parcela mensal em 36 meses
 
     return {
       entryValue,
       parcelValue,
       monthlyParcel
-    };
+    }
   }
 
   static calculateMonthlyReceivables(
@@ -33,8 +33,8 @@ export class FinancialService {
     currentMonthParcel: number,
     previousParcels: number[]
   ): number {
-    const sumPreviousParcels = previousParcels.reduce((sum, parcel) => sum + parcel, 0);
-    return currentMonthEntry + currentMonthParcel + sumPreviousParcels;
+    const sumPreviousParcels = previousParcels.reduce((sum, parcel) => sum + parcel, 0)
+    return currentMonthEntry + currentMonthParcel + sumPreviousParcels
   }
 
   static async generateFinancialProjections(
@@ -43,30 +43,30 @@ export class FinancialService {
     averageUnitValue: number,
     salesData: SalesDataDTO[]
   ): Promise<FinancialCalculations> {
-    const totalVGV = this.calculateVGV(totalUnits, averageUnitValue);
+    const totalVGV = this.calculateVGV(totalUnits, averageUnitValue)
     
-    const monthlyCashFlow = [];
-    const allParcels: number[] = [];
-    let totalSalesRevenue = 0;
+    const monthlyCashFlow = []
+    const allParcels: number[] = []
+    let totalSalesRevenue = 0
 
     for (const sales of salesData) {
       const salesValue = this.calculateMonthlySalesValue(
         totalVGV, 
         totalUnits, 
         sales.unitsSold
-      );
+      )
 
-      const paymentTerms = this.calculatePaymentTerms(salesValue);
+      const paymentTerms = this.calculatePaymentTerms(salesValue)
       
-      allParcels.push(paymentTerms.monthlyParcel);
+      allParcels.push(paymentTerms.monthlyParcel)
 
       const receivable = this.calculateMonthlyReceivables(
         paymentTerms.entryValue,
         paymentTerms.monthlyParcel,
         allParcels.slice(0, -1) // Todas as parcelas anteriores
-      );
+      )
 
-      totalSalesRevenue += receivable;
+      totalSalesRevenue += receivable
 
       monthlyCashFlow.push({
         month: sales.month,
@@ -76,21 +76,21 @@ export class FinancialService {
         parcelValue: paymentTerms.parcelValue,
         monthlyParcel: paymentTerms.monthlyParcel,
         receivable
-      });
+      })
     }
 
     return {
       totalVGV,
       totalSalesRevenue,
       monthlyCashFlow
-    };
+    }
   }
 
   static async saveFinancialData(
     projectId: string,
     calculations: FinancialCalculations
   ) {
-    const { totalVGV, totalSalesRevenue, monthlyCashFlow } = calculations;
+    const { totalVGV, totalSalesRevenue, monthlyCashFlow } = calculations
 
     // Salvar dados financeiros principais
     const financialData = await prisma.financialData.upsert({
@@ -110,7 +110,7 @@ export class FinancialService {
         grossMargin: totalSalesRevenue,
         grossMarginPercent: totalSalesRevenue > 0 ? 100 : 0
       }
-    });
+    })
 
     // Salvar fluxo de caixa mensal
     for (const cashFlow of monthlyCashFlow) {
@@ -127,10 +127,10 @@ export class FinancialService {
           projectId,
           ...cashFlow
         }
-      });
+      })
     }
 
-    return financialData;
+    return financialData
   }
 
   static async getProjectFinancials(projectId: string) {
@@ -145,7 +145,7 @@ export class FinancialService {
           }
         }
       }
-    });
+    })
   }
 
   static async getMonthlyCashFlow(projectId: string) {
@@ -155,7 +155,7 @@ export class FinancialService {
         { year: 'asc' },
         { month: 'asc' }
       ]
-    });
+    })
   }
 
   static async getAllProjectsFinancials() {
@@ -183,6 +183,6 @@ export class FinancialService {
       orderBy: {
         createdAt: 'desc'
       }
-    });
+    })
   }
 }

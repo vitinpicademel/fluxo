@@ -7,9 +7,7 @@ const { PrismaClient } = require('@prisma/client');
 const authRoutes = require('./routes/auth');
 const projectRoutes = require('./routes/projects');
 
-const prisma = new PrismaClient();
 const app = express();
-const PORT = process.env.PORT || 3333;
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -46,25 +44,4 @@ app.use('*', (req, res) => {
   res.status(404).json({ error: 'Rota não encontrada' });
 });
 
-async function startServer() {
-  try {
-    await prisma.$connect();
-    console.log('✅ Conectado ao banco de dados');
-
-    app.listen(PORT, () => {
-      console.log(`🚀 Servidor rodando na porta ${PORT}`);
-      console.log(`📊 Ambiente: ${process.env.NODE_ENV || 'development'}`);
-    });
-  } catch (error) {
-    console.error('❌ Erro ao iniciar servidor:', error);
-    process.exit(1);
-  }
-}
-
-process.on('SIGINT', async () => {
-  console.log('🔄 Desligando servidor...');
-  await prisma.$disconnect();
-  process.exit(0);
-});
-
-module.exports = startServer;
+module.exports = app;
