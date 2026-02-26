@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import jwt, { SignOptions } from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
 import { CreateUserDTO, LoginDTO } from '../types';
 import { z } from 'zod';
@@ -47,10 +47,17 @@ export const register = async (req: Request, res: Response) => {
       }
     });
 
+    const JWT_SECRET = process.env.JWT_SECRET;
+    const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN;
+
+    if (!JWT_SECRET || !JWT_EXPIRES_IN) {
+      throw new Error('JWT_SECRET and JWT_EXPIRES_IN must be defined');
+    }
+
     const token = jwt.sign(
       { userId: user.id },
-      process.env.JWT_SECRET!,
-      { expiresIn: process.env.JWT_EXPIRES_IN }
+      JWT_SECRET,
+      { expiresIn: JWT_EXPIRES_IN } as SignOptions
     );
 
     res.status(201).json({
@@ -87,10 +94,17 @@ export const login = async (req: Request, res: Response) => {
       return res.status(401).json({ error: 'Email ou senha incorretos' });
     }
 
+    const JWT_SECRET = process.env.JWT_SECRET;
+    const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN;
+
+    if (!JWT_SECRET || !JWT_EXPIRES_IN) {
+      throw new Error('JWT_SECRET and JWT_EXPIRES_IN must be defined');
+    }
+
     const token = jwt.sign(
       { userId: user.id },
-      process.env.JWT_SECRET!,
-      { expiresIn: process.env.JWT_EXPIRES_IN }
+      JWT_SECRET,
+      { expiresIn: JWT_EXPIRES_IN } as SignOptions
     );
 
     const { password, ...userWithoutPassword } = user;
