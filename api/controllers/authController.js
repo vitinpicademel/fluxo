@@ -78,6 +78,33 @@ const login = async (req, res) => {
   try {
     const validatedData = loginSchema.parse(req.body);
 
+    // MODO TESTE: Aceita qualquer email/senha
+    if (process.env.NODE_ENV !== 'production') {
+      const JWT_SECRET = process.env.JWT_SECRET || 'test-secret';
+      const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
+      
+      const testUser = {
+        id: 'test-user-id',
+        email: validatedData.email,
+        name: 'Usuário Teste',
+        role: 'USER',
+        createdAt: new Date().toISOString()
+      };
+
+      const token = jwt.sign(
+        { userId: testUser.id },
+        JWT_SECRET,
+        { expiresIn: JWT_EXPIRES_IN }
+      );
+
+      return res.json({
+        message: 'Login realizado com sucesso (modo teste)',
+        user: testUser,
+        token
+      });
+    }
+
+    // MODO PRODUÇÃO: Verificação normal
     const user = await prisma.user.findUnique({
       where: { email: validatedData.email }
     });
