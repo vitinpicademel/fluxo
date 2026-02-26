@@ -43,7 +43,7 @@ const ProjectForm = () => {
         return;
       }
       
-      const response = await fetch('http://localhost:3001/api/projects', {
+      const response = await fetch('/api/projects', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -24,7 +24,7 @@ const AdminDashboard = () => {
     setError('');
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:3001/api/projects/admin/all', {
+      const response = await fetch('/api/projects/admin/all', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -44,7 +44,7 @@ const AdminDashboard = () => {
     setError('');
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:3001/api/projects/admin/users', {
+      const response = await fetch('/api/projects/admin/users', {
         headers: {
           Authorization: `Bearer ${token}`,
         },

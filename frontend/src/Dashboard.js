@@ -21,7 +21,7 @@ const Dashboard = () => {
       try {
         const token = localStorage.getItem('token');
 
-        const response = await fetch('http://localhost:3001/api/projects/my-projects', {
+        const response = await fetch('/api/projects/my-projects', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const data = await response.json();
