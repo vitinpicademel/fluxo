@@ -1,0 +1,115 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      String   @default("USER") // "USER" | "ADMIN"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relacionamentos
+  projects Project[]
+
+  @@map("users")
+}
+
+model Project {
+  id          String      @id @default(cuid())
+  userId      String
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  // Dados da empresa/incorporadora
+  companyName      String
+  cnpj            String
+  responsibleName String
+  responsibleRole String
+  corporateEmail  String
+  phone           String
+  city            String
+  state           String
+  projectType     String // "VERTICAL" | "HORIZONTAL" | "MISTO"
+
+  // Premissas gerais de vendas
+  totalUnits               Int
+  averageUnitValue         Float // Valor médio por unidade em R$
+  salesStartDate           DateTime // Data de início da curva de vendas
+  salesDurationMonths      Int // Duração da curva de vendas em meses
+
+  // Status do projeto
+  status String @default("PENDING") // PENDING, APPROVED, REJECTED
+
+  // Relacionamentos
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  salesData      SalesData[]
+  financialData  FinancialData?
+
+  @@map("projects")
+}
+
+model SalesData {
+  id        String   @id @default(cuid())
+  projectId String
+  month     Int      // Mês da curva de vendas (1, 2, 3...)
+  year      Int      // Ano da curva de vendas
+  unitsSold Int      // Quantidade de unidades vendidas neste mês
+  createdAt DateTime @default(now())
+
+  // Relacionamentos
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, month, year])
+  @@map("sales_data")
+}
+
+model FinancialData {
+  id                    String   @id @default(cuid())
+  projectId             String   @unique
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  // Cálculos financeiros (apenas para ADMIN)
+  totalVGV              Float    // VGV Total
+  totalSalesRevenue     Float    // Receita Total de Vendas
+  totalExpenses         Float    // Despesas Totais
+  grossMargin           Float    // Margem Bruta
+  grossMarginPercent    Float    // Margem Bruta Percentual
+  
+  // Métricas financeiras avançadas
+  internalRateOfReturn  Float?   // TIR
+  netPresentValue       Float?   // VPL
+  paybackMonths         Int?     // Payback em meses
+
+  // Relacionamentos
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@map("financial_data")
+}
+
+model MonthlyCashFlow {
+  id          String   @id @default(cuid())
+  projectId   String
+  month       Int
+  year        Int
+  salesValue  Float    // Valor de vendas do mês
+  entryValue  Float    // Entrada (10%)
+  parcelValue Float    // Valor parcelado (90%)
+  monthlyParcel Float  // Parcela mensal (valor parcelado / 36)
+  receivable  Float    // Recebível do mês
+  createdAt   DateTime @default(now())
+
+  @@unique([projectId, month, year])
+  @@map("monthly_cash_flow")
+}
