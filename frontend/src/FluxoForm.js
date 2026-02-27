@@ -302,7 +302,7 @@ const FluxoForm = () => {
                 Parâmetros Financeiros
               </h2>
               
-              <div className="grid gap-6 sm:grid-cols-2">
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 <div>
                   <label className="mb-2 block text-sm font-medium text-slate-700">
                     % Entrada
@@ -329,6 +329,18 @@ const FluxoForm = () => {
                 
                 <div>
                   <label className="mb-2 block text-sm font-medium text-slate-700">
+                    Meses Parcelamento
+                  </label>
+                  <input
+                    type="number"
+                    value={fluxoData.mesesParcelamento}
+                    onChange={(e) => handleInputChange('fluxo', 'mesesParcelamento', e.target.value)}
+                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 placeholder-slate-500 transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  />
+                </div>
+                
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-slate-700">
                     ITBI (%)
                   </label>
                   <input
@@ -342,6 +354,32 @@ const FluxoForm = () => {
                 
                 <div>
                   <label className="mb-2 block text-sm font-medium text-slate-700">
+                    IPTU Anual (R$)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={despesasData.iptuAnual}
+                    onChange={(e) => handleInputChange('despesas', 'iptuAnual', e.target.value)}
+                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 placeholder-slate-500 transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  />
+                </div>
+                
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-slate-700">
+                    Escritura/Registro (%)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={despesasData.escrituraRegistro}
+                    onChange={(e) => handleInputChange('despesas', 'escrituraRegistro', e.target.value)}
+                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 placeholder-slate-500 transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  />
+                </div>
+                
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-slate-700">
                     Terreno (%)
                   </label>
                   <input
@@ -349,6 +387,71 @@ const FluxoForm = () => {
                     step="0.01"
                     value={despesasData.terrenoPercentual}
                     onChange={(e) => handleInputChange('despesas', 'terrenoPercentual', e.target.value)}
+                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 placeholder-slate-500 transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  />
+                </div>
+                
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-slate-700">
+                    Obra (%)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={despesasData.obraPercentual}
+                    onChange={(e) => handleInputChange('despesas', 'obraPercentual', e.target.value)}
+                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 placeholder-slate-500 transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  />
+                </div>
+                
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-slate-700">
+                    Comissão Venda (%)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={despesasData.comissaoVenda}
+                    onChange={(e) => handleInputChange('despesas', 'comissaoVenda', e.target.value)}
+                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 placeholder-slate-500 transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  />
+                </div>
+                
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-slate-700">
+                    Publicidade (%)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={despesasData.publicidadePercentual}
+                    onChange={(e) => handleInputChange('despesas', 'publicidadePercentual', e.target.value)}
+                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 placeholder-slate-500 transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  />
+                </div>
+                
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-slate-700">
+                    Taxa Administração (%)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={despesasData.taxaAdministracao}
+                    onChange={(e) => handleInputChange('despesas', 'taxaAdministracao', e.target.value)}
+                    className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 placeholder-slate-500 transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  />
+                </div>
+                
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-slate-700">
+                    RET (%)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={despesasData.retPercentual}
+                    onChange={(e) => handleInputChange('despesas', 'retPercentual', e.target.value)}
                     className="w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 placeholder-slate-500 transition-colors focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                   />
                 </div>
